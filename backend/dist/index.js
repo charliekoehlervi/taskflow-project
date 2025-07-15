@@ -1,4 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hello = void 0;
-exports.hello = 'Hello from backend!';
+const express_1 = __importDefault(require("express"));
+const app = (0, express_1.default)();
+const PORT = 3000;
+app.get('/health', (_req, res) => {
+    return res.status(200).json({ status: 'ok' });
+});
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+});

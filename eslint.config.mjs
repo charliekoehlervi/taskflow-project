@@ -3,6 +3,7 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import globals from 'globals';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,6 +23,12 @@ export default [
     },
     rules: {
       ...tseslint.configs.recommended.rules,
+    },
+  },
+  {
+    files: ['backend/**/*.ts'],
+    languageOptions: {
+      globals: { ...globals.node },
     },
   },
   {
