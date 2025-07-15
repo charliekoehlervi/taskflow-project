@@ -1,2 +1,4 @@
+**/.svelte-kit/**
+.svelte-kit/
 dist/
 node_modules/ 
