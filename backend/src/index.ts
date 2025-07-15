@@ -1,1 +1,1 @@
-export const hello = 'Hello from backend again x2!'; 
+export const hello = 'Hello from backend again x2!';

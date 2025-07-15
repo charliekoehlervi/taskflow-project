@@ -1,1 +1,1 @@
-export const hello = 'Hello from frontend!'; 
+export const hello = 'Hello from frontend!';

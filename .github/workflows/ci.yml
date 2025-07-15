@@ -28,4 +28,4 @@ jobs:
         run: npm run format:check
 
       - name: TypeScript build
-        run: npx tsc --build 
+        run: npx tsc --build
