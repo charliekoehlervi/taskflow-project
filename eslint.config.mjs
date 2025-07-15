@@ -25,6 +25,6 @@ export default [
     },
   },
   {
-    ignores: ['**/dist/**', 'node_modules/'],
+    ignores: ['**/dist/**', '**/.svelte-kit/**', 'node_modules/'],
   },
 ];
