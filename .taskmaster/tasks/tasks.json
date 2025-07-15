@@ -1,0 +1,1094 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 25,
+        "title": "Initialize Monorepo & Development Environment",
+        "description": "Set up the root repository with TypeScript, workspace structure for frontend and backend, and core tooling.",
+        "details": "• Create root package.json with workspaces for /frontend and /backend\n• Initialize tsconfig.json at root and extend in subprojects\n• Install linters (ESLint, Prettier), commit hooks (Husky)\n• Configure CI pipeline skeleton (GitHub Actions)",
+        "testStrategy": "Run lint and type-check commands; verify both frontend and backend folders build without errors",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize monorepo workspace structure",
+            "description": "Create the root package.json defining workspaces for frontend and backend and scaffold directories",
+            "dependencies": [],
+            "details": "In the project root, run `npm init -y` to generate package.json. Add a \"workspaces\" field with [\"frontend\",\"backend\"]. Create `/frontend` and `/backend` directories and add minimal package.json placeholders in each.",
+            "status": "pending",
+            "testStrategy": "Run `npm install` and verify that both frontend and backend folders appear under node_modules/workspace symlinks"
+          },
+          {
+            "id": 2,
+            "title": "Configure TypeScript project references",
+            "description": "Set up a root tsconfig.json and extend it in both frontend and backend",
+            "dependencies": [1],
+            "details": "Create `tsconfig.json` in root with shared compilerOptions (e.g., target, moduleResolution, strict). In `/frontend` and `/backend`, create `tsconfig.json` files that use \"extends\": \"../tsconfig.json\" and define their own include patterns and outDir.",
+            "status": "pending",
+            "testStrategy": "Execute `npx tsc --build` in each subproject and confirm no errors and correct output directories"
+          },
+          {
+            "id": 3,
+            "title": "Install and configure ESLint and Prettier",
+            "description": "Add linting and formatting configurations at the root and ensure subprojects inherit them",
+            "dependencies": [1],
+            "details": "At root, install devDependencies: `eslint`, `prettier`, `eslint-config-prettier`, `eslint-plugin-@typescript-eslint`, etc. Create `.eslintrc.js` with TypeScript parser and rule sets, and `.prettierrc` for formatting rules. Add lint/format scripts to root package.json. Ensure workspaces pick up these configs.",
+            "status": "pending",
+            "testStrategy": "Run `npm run lint` and `npm run format:check` to confirm configurations load without errors"
+          },
+          {
+            "id": 4,
+            "title": "Set up Husky commit hooks",
+            "description": "Configure commit hooks to enforce linting and formatting before commits",
+            "dependencies": [3],
+            "details": "Install `husky` as a devDependency. Add a \"prepare\" script: `husky install`. Run `npm run prepare` and add a pre-commit hook: `npx husky add .husky/pre-commit \"npm run lint && npm run format:check\"`. Optionally add a pre-push hook for `npm test`.",
+            "status": "pending",
+            "testStrategy": "Attempt to commit code with lint or format errors and verify the commit is blocked; commit clean code to confirm success"
+          },
+          {
+            "id": 5,
+            "title": "Configure GitHub Actions CI pipeline",
+            "description": "Create a CI workflow skeleton to install, lint, build, and test on push and pull requests",
+            "dependencies": [2, 3, 4],
+            "details": "In `.github/workflows/ci.yml`, define a workflow for `push` and `pull_request`. Include steps: checkout, setup Node, cache dependencies, run `npm install`, `npm run lint`, `npx tsc --build`, and placeholder for `npm test`. Configure caching for `~/.npm` and `~/.cache` for speed.",
+            "status": "pending",
+            "testStrategy": "Push the new workflow to a test branch and verify that GitHub Actions runs the jobs, all steps complete successfully or fail appropriately"
+          }
+        ]
+      },
+      {
+        "id": 26,
+        "title": "Configure Frontend Framework (SvelteKit) with PWA",
+        "description": "Install and configure SvelteKit in /frontend with PWA support for installable web app.",
+        "details": "• Run `npm create svelte@latest frontend` and choose TypeScript\n• Install Vite PWA plugin (@vite-pwa/sveltekit)\n• Configure svelte.config.js adapter-auto and Vite plugin in vite.config.ts\n• Add manifest.webmanifest with app metadata and icons",
+        "testStrategy": "Start `npm run dev` in /frontend; verify PWA install prompt appears in supported browsers",
+        "priority": "high",
+        "dependencies": [25],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize SvelteKit Project",
+            "description": "Scaffold a new SvelteKit application in the /frontend directory with TypeScript support.",
+            "dependencies": [],
+            "details": "Run `npm create svelte@latest frontend`, choose the TypeScript template, then `cd frontend` and run `npm install` to install base dependencies.",
+            "status": "pending",
+            "testStrategy": "Verify that the development server starts by running `npm run dev` and that the default SvelteKit welcome page is served at http://localhost:5173/."
+          },
+          {
+            "id": 2,
+            "title": "Install Vite PWA Plugin",
+            "description": "Add the @vite-pwa/sveltekit plugin to enable PWA capabilities in the project.",
+            "dependencies": [1],
+            "details": "In `/frontend`, run `npm install @vite-pwa/sveltekit --save-dev`. Confirm that `@vite-pwa/sveltekit` appears in devDependencies within package.json.",
+            "status": "pending",
+            "testStrategy": "Check that the plugin is listed under devDependencies in package.json and that `node_modules/@vite-pwa/sveltekit` exists."
+          },
+          {
+            "id": 3,
+            "title": "Configure adapter-auto in svelte.config.js",
+            "description": "Set up the SvelteKit configuration to use the default adapter-auto for server builds.",
+            "dependencies": [1],
+            "details": "Open `/frontend/svelte.config.js`. Import `adapter-auto` from `@sveltejs/adapter-auto` and assign it to the `kit.adapter` property in the exported config. Save the file.",
+            "status": "pending",
+            "testStrategy": "Run `npm run build` and verify that the build completes successfully using the adapter-auto output without errors."
+          },
+          {
+            "id": 4,
+            "title": "Add Vite PWA Plugin to vite.config.ts",
+            "description": "Integrate the PWA plugin into the Vite configuration.",
+            "dependencies": [2, 3],
+            "details": "Open `/frontend/vite.config.ts`. Import `sveltekit` from `@sveltejs/kit/vite` and `VitePWA` from `@vite-pwa/sveltekit`. Within the `defineConfig` plugins array, add `sveltekit()` then `VitePWA({ registerType: 'autoUpdate', manifest: {} })` (manifest to be filled later). Save changes.",
+            "status": "pending",
+            "testStrategy": "Run `npm run dev` and inspect the console output to verify the PWA plugin initializes without errors."
+          },
+          {
+            "id": 5,
+            "title": "Add Web App Manifest and Icons",
+            "description": "Create and configure the `manifest.webmanifest` file with app metadata and icons for installability.",
+            "dependencies": [4],
+            "details": "In `/frontend/static` (or `/public`), create `manifest.webmanifest`. Populate it with fields like `name`, `short_name`, `start_url`, `display`, `background_color`, and an `icons` array referencing PNG assets in the same folder. Add link `<link rel=\"manifest\" href=\"/manifest.webmanifest\">` in `src/app.html` head.",
+            "status": "pending",
+            "testStrategy": "Start the dev server, open Chrome DevTools > Application > Manifest. Confirm the manifest loads correctly, icons are displayed, and the install prompt can be triggered."
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "title": "Configure Backend Server (Node.js & TypeScript)",
+        "description": "Set up a basic Express (or chosen) server in /backend with TypeScript support and health endpoint.",
+        "details": "• Initialize /backend with npm, install express, typescript, ts-node-dev\n• Create tsconfig.json, setup src/index.ts\n• Implement GET /health returning status 200\n• Configure dotenv for environment variables",
+        "testStrategy": "Run `npm run dev` and curl localhost:3000/health; expect JSON { status: 'OK' }",
+        "priority": "high",
+        "dependencies": [25],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize backend project and install core dependencies",
+            "description": "Set up the /backend directory as a Node.js project and install Express, TypeScript, ts-node-dev, and essential type definitions.",
+            "dependencies": [],
+            "details": "In the project root, create a directory named backend. Navigate into /backend and run `npm init -y`. Then install production dependency: `npm install express`. Install dev dependencies: `npm install --save-dev typescript ts-node-dev @types/express @types/node`.",
+            "status": "pending",
+            "testStrategy": "Verify that package.json is created and lists express in dependencies and typescript, ts-node-dev, @types/express, @types/node in devDependencies. Ensure node_modules folder is populated."
+          },
+          {
+            "id": 2,
+            "title": "Add and configure tsconfig.json",
+            "description": "Create a TypeScript configuration file to define compiler options and project structure.",
+            "dependencies": [1],
+            "details": "In /backend root, create tsconfig.json with compilerOptions: target ES6, module commonjs, outDir ./dist, rootDir ./src, strict true, esModuleInterop true, skipLibCheck true. Ensure a src directory exists (create if missing).",
+            "status": "pending",
+            "testStrategy": "Run `npx tsc --noEmit`. There should be no errors and tsconfig.json settings should be recognized."
+          },
+          {
+            "id": 3,
+            "title": "Create Express server boilerplate and npm scripts",
+            "description": "Implement basic Express server setup in TypeScript and configure package.json scripts for development and building.",
+            "dependencies": [2],
+            "details": "In package.json add scripts:\n- \"dev\": \"ts-node-dev --respawn --transpile-only src/index.ts\"\n- \"build\": \"tsc\"\nCreate src/index.ts with:\nimport express from 'express';\nconst app = express();\nconst PORT = 3000;\napp.listen(PORT, () => console.log(`Server listening on port ${PORT}`));",
+            "status": "pending",
+            "testStrategy": "Run `npm run dev` and verify the console logs \"Server listening on port 3000\". Ensure no TypeScript runtime errors."
+          },
+          {
+            "id": 4,
+            "title": "Implement GET /health endpoint",
+            "description": "Add a health check endpoint that returns HTTP 200 to confirm the server is running.",
+            "dependencies": [3],
+            "details": "In src/index.ts, before the app.listen call, add:\napp.get('/health', (_req, res) => {\n  return res.status(200).json({ status: 'ok' });\n});",
+            "status": "pending",
+            "testStrategy": "With the server running (`npm run dev`), send a request to http://localhost:3000/health (e.g., `curl http://localhost:3000/health`) and confirm a 200 response with JSON `{ \"status\": \"ok\" }`."
+          },
+          {
+            "id": 5,
+            "title": "Configure dotenv for environment variables",
+            "description": "Install and integrate dotenv to manage environment variables such as PORT.",
+            "dependencies": [4],
+            "details": "In /backend run `npm install dotenv @types/dotenv --save-dev`. In src/index.ts add at the top:\nimport dotenv from 'dotenv';\ndotenv.config();\nModify the server to use:\nconst PORT = process.env.PORT ? Number(process.env.PORT) : 3000;\nCreate a .env file in /backend with `PORT=3000` (or desired value).",
+            "status": "pending",
+            "testStrategy": "Add or change PORT value in .env, restart server with `npm run dev`, and verify that the server listens on the port defined in .env via console log or by accessing the /health endpoint on that port."
+          }
+        ]
+      },
+      {
+        "id": 28,
+        "title": "Define Data Models & Database Setup (PostgreSQL)",
+        "description": "Design and implement database schema for projects, PRDs, tasks, subtasks using Prisma.",
+        "details": "• Install Prisma and initialize schema.prisma\n• Define models: Project, PRD, Task, Subtask, PromptHistory\n• Configure PostgreSQL datasource in .env\n• Generate and run migrations",
+        "testStrategy": "Run `prisma migrate dev`; verify tables in the database via `prisma studio`",
+        "priority": "high",
+        "dependencies": [27],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and Initialize Prisma with PostgreSQL",
+            "description": "Set up Prisma in the project and configure the PostgreSQL datasource in the .env file.",
+            "dependencies": [],
+            "details": "Run `npm install prisma @prisma/client`, then `npx prisma init`. In the generated .env file, set `DATABASE_URL` to your PostgreSQL connection string. Confirm that `schema.prisma` has a `datasource db` block referencing `env(\"DATABASE_URL\")`.",
+            "status": "pending",
+            "testStrategy": "Run `npx prisma --version` to confirm installation and verify that `npx prisma db pull` can connect to the database without errors."
+          },
+          {
+            "id": 2,
+            "title": "Define Project and PRD Models in Prisma Schema",
+            "description": "Add `Project` and `PRD` models to `schema.prisma` with appropriate fields and relations.",
+            "dependencies": [1],
+            "details": "In `schema.prisma`, define a `Project` model with fields like `id`, `name`, `description`, `createdAt`, `updatedAt`. Then define a `PRD` model referencing `Project` via a foreign key and include fields such as `id`, `title`, `content`, `projectId`, timestamps, and relation attributes (`@relation`).",
+            "status": "pending",
+            "testStrategy": "Use `npx prisma validate` to ensure the schema is valid and inspect the models in Prisma Studio with `npx prisma studio`."
+          },
+          {
+            "id": 3,
+            "title": "Define Task and Subtask Models with Relations",
+            "description": "Implement `Task` and `Subtask` models in the Prisma schema, linking tasks to projects/PRDs and subtasks to tasks.",
+            "dependencies": [2],
+            "details": "In `schema.prisma`, create a `Task` model with fields `id`, `title`, `status`, `projectId` (or `prdId`), timestamps, and proper `@relation` annotations to either `Project` or `PRD`. Then add a `Subtask` model with `id`, `title`, `completed`, `taskId`, timestamps, and a relation to `Task`.",
+            "status": "pending",
+            "testStrategy": "Validate the schema (`npx prisma validate`) and test relations in Prisma Studio by creating sample tasks and subtasks."
+          },
+          {
+            "id": 4,
+            "title": "Add PromptHistory Model and Configure Relations",
+            "description": "Define the `PromptHistory` model to record prompts issued for tasks or subtasks, including timestamps and relation fields.",
+            "dependencies": [3],
+            "details": "In `schema.prisma`, add a `PromptHistory` model with fields `id`, `promptText`, `responseText`, `createdAt`, and foreign keys such as `taskId` or `subtaskId`. Use `@relation` annotations to link back to `Task` and `Subtask`. Ensure optional relation fields if a prompt can belong to either model.",
+            "status": "pending",
+            "testStrategy": "Run `npx prisma validate` and in Prisma Studio create a prompt history entry linked to a task and verify relational integrity."
+          },
+          {
+            "id": 5,
+            "title": "Generate and Apply Migrations, Generate Client",
+            "description": "Generate Prisma migrations based on the updated schema and run them against the PostgreSQL database, then generate the Prisma client.",
+            "dependencies": [4],
+            "details": "Execute `npx prisma migrate dev --name init_schema` to generate and apply a migration. After the migration completes, run `npx prisma generate` to update the Prisma client. Check the database directly (e.g., using psql) to ensure all tables and relations are created.",
+            "status": "pending",
+            "testStrategy": "Write a simple script using the Prisma client to create and query each model (Project, PRD, Task, Subtask, PromptHistory) and confirm CRUD operations succeed without errors."
+          }
+        ]
+      },
+      {
+        "id": 29,
+        "title": "Implement Local-first Storage Service",
+        "description": "Provide a service to save and load project JSON locally via IndexedDB or File System API.",
+        "details": "• Create a SvelteKit store for project data\n• Implement saveToIndexedDB and loadFromIndexedDB utilities\n• Implement File System Access API fallback for PWA and Electron\n• Abstract methods behind ProjectStorageService",
+        "testStrategy": "Save a sample project object, reload app, load from storage, and assert object equality",
+        "priority": "high",
+        "dependencies": [26],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create SvelteKit Project Data Store",
+            "description": "Define a centralized SvelteKit writable store to hold and update the current project JSON in memory.",
+            "dependencies": [],
+            "details": "In src/stores/projectStore.ts, import writable from 'svelte/store' and create a store of type any or a defined Project interface. Initialize with an empty object or default project. Export helper methods like setProject, updateProjectField, and subscribe.",
+            "status": "pending",
+            "testStrategy": "Write unit tests to verify initial state, setProject updates the store correctly, and updateProjectField modifies only specified fields."
+          },
+          {
+            "id": 2,
+            "title": "Implement IndexedDB Save and Load Utilities",
+            "description": "Develop saveToIndexedDB and loadFromIndexedDB functions to persist and retrieve project JSON using IndexedDB.",
+            "dependencies": [1],
+            "details": "In src/utils/indexedDb.ts, use the idb library or vanilla IndexedDB API to open a database named 'ProjectDB' version 1 with an object store 'projects'. Implement saveToIndexedDB(project: Project) to put data under a fixed key. Implement loadFromIndexedDB(): Promise<Project | null> to get the record. Handle errors and database upgrades.",
+            "status": "pending",
+            "testStrategy": "Use a mock IndexedDB (like fake-indexeddb) in tests to assert that saveToIndexedDB stores the correct JSON and loadFromIndexedDB retrieves it or returns null if absent."
+          },
+          {
+            "id": 3,
+            "title": "Implement File System Access API Fallback",
+            "description": "Provide fallback methods saveToFileSystem and loadFromFileSystem for environments like PWA or Electron where IndexedDB may not suffice.",
+            "dependencies": [2],
+            "details": "In src/utils/fileSystem.ts, detect window.showSaveFilePicker and window.showOpenFilePicker. For saveToFileSystem, prompt user for a file, create a writable stream, and write JSON. For loadToFileSystem, prompt for file, read the file as text, parse JSON. In Electron, wrap window.electron.fs methods if available.",
+            "status": "pending",
+            "testStrategy": "Manually test in Chrome PWA and Electron: verify file picker opens, files are written and read correctly; simulate permission denial to check error handling."
+          },
+          {
+            "id": 4,
+            "title": "Create ProjectStorageService Abstraction",
+            "description": "Abstract the persistence logic behind a ProjectStorageService class that selects IndexedDB or File System methods at runtime.",
+            "dependencies": [2, 3],
+            "details": "In src/services/ProjectStorageService.ts, define an interface IProjectStorageService with save(project) and load() methods. Implement ProjectStorageService that in constructor feature-detects File System API; if available and opted-in, use fileSystem.ts methods; otherwise use indexedDb.ts methods. Expose a singleton instance.",
+            "status": "pending",
+            "testStrategy": "Unit test by mocking indexedDb and fileSystem modules. Verify that save() and load() delegate to the correct implementation based on feature detection flags."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Storage Service into SvelteKit Store",
+            "description": "Wire the ProjectStorageService into the Svelte store so the UI can trigger save and load operations seamlessly.",
+            "dependencies": [1, 4],
+            "details": "In projectStore.ts, import the ProjectStorageService singleton. Add async methods store.saveToStorage() and store.loadFromStorage() that call service.save(currentProject) and service.load(), then update the writable store. Handle loading states and errors by expanding the store or exporting derived stores.",
+            "status": "pending",
+            "testStrategy": "Write integration tests that stub ProjectStorageService methods. Verify that calling store.loadFromStorage populates the store with returned data and that saveToStorage invokes the service with the correct payload."
+          }
+        ]
+      },
+      {
+        "id": 30,
+        "title": "Implement Basic Authentication (Clerk Integration)",
+        "description": "Integrate Clerk for user login/logout and protect backend endpoints.",
+        "details": "• Install @clerk/clerk-sdk and @clerk/nextjs (or Express middleware) in backend and frontend\n• Configure Clerk keys in environment\n• Wrap SvelteKit routes with Clerk session checks\n• Protect /api/** routes to require authentication",
+        "testStrategy": "Attempt to access protected API without login (expect 401); log in via Clerk and retest (expect 200)",
+        "priority": "high",
+        "dependencies": [26, 27],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install Clerk SDK Packages",
+            "description": "Add Clerk dependencies to both frontend and backend projects",
+            "dependencies": [],
+            "details": "Run npm install @clerk/clerk-sdk @clerk/nextjs (for Next.js) or @clerk/clerk-sdk-node (for Express) in the backend, and npm install @clerk/nextjs in the SvelteKit frontend. Ensure versions are compatible with your Node.js and framework versions.",
+            "status": "pending",
+            "testStrategy": "Verify that the packages appear in package.json and node_modules without installation errors."
+          },
+          {
+            "id": 2,
+            "title": "Configure Clerk Environment Variables",
+            "description": "Set up Clerk API keys and configuration in environment files",
+            "dependencies": [1],
+            "details": "Create or update .env.local (frontend) and .env (backend) with NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY and CLERK_JWT_KEY. Load variables using dotenv in backend and SvelteKit’s $env/static/private or $env/static/public.",
+            "status": "pending",
+            "testStrategy": "Log process.env values in development to confirm keys are loaded; fail startup if any required key is missing."
+          },
+          {
+            "id": 3,
+            "title": "Integrate Clerk Provider in Frontend",
+            "description": "Wrap the SvelteKit application with Clerk context for login/logout UI",
+            "dependencies": [2],
+            "details": "In src/routes/+layout.svelte or equivalent, import ClerkProvider from @clerk/nextjs. Wrap your slot content with <ClerkProvider publishableKey={import.meta.env.VITE_PUBLIC_CLERK_PUBLISHABLE_KEY}>. Create LoginButton and LogoutButton components using useClerk hooks.",
+            "status": "pending",
+            "testStrategy": "Start the frontend, navigate to the app, and verify the Login and Logout buttons render and redirect to Clerk-hosted auth pages."
+          },
+          {
+            "id": 4,
+            "title": "Protect SvelteKit Routes with Session Checks",
+            "description": "Enforce authentication on selected frontend routes",
+            "dependencies": [3],
+            "details": "In load functions of protected +page.ts files, import auth from @clerk/nextjs/server and call auth(). If no session, redirect to /sign-in. For endpoints in src/routes/api, use handle hooks in hooks.server.ts to check auth for /api/** and return 401 if unauthorized.",
+            "status": "pending",
+            "testStrategy": "Attempt to access protected routes without authentication (should redirect) and with a valid session (should succeed)."
+          },
+          {
+            "id": 5,
+            "title": "Secure Backend /api Endpoints",
+            "description": "Add Clerk middleware to require authentication for API calls",
+            "dependencies": [2],
+            "details": "In your Express or Next.js API handlers, import requireSession from @clerk/nextjs/server or clerk-sdk-node. Wrap or apply requireSession middleware on /api/** routes. Extract userId from the session and attach to req.user for downstream logic.",
+            "status": "pending",
+            "testStrategy": "Call a protected API endpoint without a session token (expect 401), then with a valid Clerk session token (expect 200 and correct userId in response)."
+          }
+        ]
+      },
+      {
+        "id": 31,
+        "title": "Design PRD Interview Flow UI",
+        "description": "Build a multi-step form in SvelteKit capturing project goal, users, scope, platforms, collaboration level.",
+        "details": "• Create Svelte components for each interview step\n• Use Svelte stores for interim state\n• Include form validation per field\n• Provide Next/Back navigation and progress indicator",
+        "testStrategy": "Manually navigate steps, validate required inputs, and ensure navigation works",
+        "priority": "medium",
+        "dependencies": [26],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize SvelteKit environment and folder structure",
+            "description": "Set up a new SvelteKit project or prepare the existing repository for the PRD interview flow UI. Install necessary dependencies and configure routing to host the multi-step form.",
+            "dependencies": [],
+            "details": "Run `npm init svelte@next` (or use existing project), install packages with `npm install`, create a new route under `src/routes/interview/+layout.svelte` for the multi-step form container, and scaffold folders like `src/lib/components/interview` and `src/lib/stores`.",
+            "status": "pending",
+            "testStrategy": "Run `npm run dev` and verify the `/interview` route serves the layout shell without errors."
+          },
+          {
+            "id": 2,
+            "title": "Create Svelte components for each interview step",
+            "description": "Implement five separate Svelte components for the interview steps: project goal, users, scope, platforms, and collaboration level.",
+            "dependencies": [1],
+            "details": "In `src/lib/components/interview`, create `StepGoal.svelte`, `StepUsers.svelte`, `StepScope.svelte`, `StepPlatforms.svelte`, and `StepCollaboration.svelte`. Each component should export its data via props or events and render labeled input fields, text areas or selectors as required.",
+            "status": "pending",
+            "testStrategy": "Render each component in isolation (e.g., via a Storybook story or dummy page) and verify all input fields appear with correct labels."
+          },
+          {
+            "id": 3,
+            "title": "Implement Svelte stores for form state management",
+            "description": "Create and configure Svelte stores to hold interim form data and the current step index across the multi-step flow.",
+            "dependencies": [2],
+            "details": "In `src/lib/stores/interviewStore.js`, import `writable` from `svelte/store`. Define `currentStep` store (initial value 0) and a `formData` store with keys for goal, users, scope, platforms, collaboration. Export update methods or use `formData.update` directly in components.",
+            "status": "pending",
+            "testStrategy": "Write unit tests with Vitest to update each store property and confirm subscribers receive the new values."
+          },
+          {
+            "id": 4,
+            "title": "Add field-level validation for each interview step",
+            "description": "Implement validation logic to ensure required fields are filled and input formats are correct before allowing navigation to the next step.",
+            "dependencies": [3],
+            "details": "Use Svelte reactive statements or integrate a validation library like Zod. For each step component, write a `validate()` function that checks the store values and sets an `errors` object. Display error messages under each field when validation fails.",
+            "status": "pending",
+            "testStrategy": "Unit-test each `validate()` function with valid and invalid inputs to confirm correct error outputs; manually test the UI by entering bad data and verifying errors appear."
+          },
+          {
+            "id": 5,
+            "title": "Implement navigation controls and progress indicator",
+            "description": "Add Next and Back buttons, handle step transitions, and display a progress bar or step indicator reflecting the current position.",
+            "dependencies": [4],
+            "details": "In `src/routes/interview/+layout.svelte`, subscribe to `currentStep` and render the corresponding step component. Place Next/Back buttons that call store update methods. Disable Next when validation errors exist. Add a progress bar whose width or label is computed as `(currentStep+1)/5 * 100%`.",
+            "status": "pending",
+            "testStrategy": "Use Playwright or Cypress end-to-end tests to simulate clicking Next/Back across all steps, verify state updates, validation enforcement, and correct progress indicator behavior."
+          }
+        ]
+      },
+      {
+        "id": 32,
+        "title": "Implement PRD Interview Data Collection & JSON Storage",
+        "description": "Collect form data from interview flow and assemble structured PRD JSON, then store it locally.",
+        "details": "• On final step, map form values to PRD JSON schema\n• Use ProjectStorageService.save() to persist PRD JSON\n• Emit event to trigger task generation",
+        "testStrategy": "Complete interview, inspect stored JSON for correct fields matching PRD schema",
+        "priority": "medium",
+        "dependencies": [31, 29],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define PRD JSON Schema and TypeScript Interface",
+            "description": "Review the PRD JSON schema requirements and create or update the TypeScript interface representing the PRD data structure.",
+            "dependencies": [],
+            "details": "Gather field definitions from product docs; create a PRD interface in codebase (e.g., IPrdJson) capturing all required properties, types, and nested structures.",
+            "status": "pending",
+            "testStrategy": "Write a schema validation test to ensure the TypeScript interface matches the documented JSON schema."
+          },
+          {
+            "id": 2,
+            "title": "Collect Form Data in Final Interview Step",
+            "description": "Implement logic in the final interview screen or component to aggregate all user inputs into a single form data object.",
+            "dependencies": [1],
+            "details": "Use your form framework (Reactive Forms, Formik, etc.) to read values from each field; combine them into a plain JS object representing raw interview data.",
+            "status": "pending",
+            "testStrategy": "Unit test the form component by simulating user input and verifying the aggregated data object matches expected values."
+          },
+          {
+            "id": 3,
+            "title": "Map Raw Form Data to PRD JSON Structure",
+            "description": "Create a mapper function that transforms the raw form data object into the structured PRD JSON defined by the interface.",
+            "dependencies": [2],
+            "details": "Implement a function mapFormToPrdJson(rawData) that assigns values to the PRD JSON schema fields, applies defaults, formats dates or enums, and handles nested arrays/objects.",
+            "status": "pending",
+            "testStrategy": "Write unit tests for mapFormToPrdJson using sample rawData cases to validate correct mapping and default application."
+          },
+          {
+            "id": 4,
+            "title": "Persist PRD JSON with ProjectStorageService",
+            "description": "Use ProjectStorageService.save() to store the mapped PRD JSON object locally or in the designated storage medium.",
+            "dependencies": [3],
+            "details": "Inject or import ProjectStorageService in your component or service; call save(projectId, prdJson) and handle the returned Promise/Observable, including error catch and retry logic if needed.",
+            "status": "pending",
+            "testStrategy": "Mock ProjectStorageService in a unit test to verify save() is called with the correct project ID and JSON payload, and simulate error paths."
+          },
+          {
+            "id": 5,
+            "title": "Emit Event to Trigger Task Generation",
+            "description": "After successful persistence of the PRD JSON, emit an application-wide event or dispatch an action to start the subsequent task generation workflow.",
+            "dependencies": [4],
+            "details": "Subscribe to the save() result; upon success, use EventEmitter or dispatch to your event bus/store (e.g., emit('PRD_SAVED', { projectId })) to notify downstream listeners.",
+            "status": "pending",
+            "testStrategy": "Integration test the end-to-end flow: mock save() to resolve, then verify that the PRD_SAVED event is emitted with the correct payload."
+          }
+        ]
+      },
+      {
+        "id": 33,
+        "title": "Setup AI Integration Infrastructure (LangChain)",
+        "description": "Install and configure LangChain and providers for OpenAI and Cursor AI.",
+        "details": "• Add langchain, openai, @cursorai/sdk to backend dependencies\n• Configure environment variables for API keys\n• Initialize LangChain chains for text generation in a dedicated service module",
+        "testStrategy": "Invoke a test chain with a simple prompt; ensure non-error response",
+        "priority": "high",
+        "dependencies": [27],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install AI Integration Dependencies",
+            "description": "Add langchain, openai, and @cursorai/sdk packages to the backend project dependencies",
+            "dependencies": [],
+            "details": "Run `npm install langchain openai @cursorai/sdk --save` (or `yarn add`). Verify that package.json lists these dependencies and that the modules appear under node_modules.",
+            "status": "pending",
+            "testStrategy": "Confirm via `npm list` or `yarn list` that all three packages are installed"
+          },
+          {
+            "id": 2,
+            "title": "Configure Environment Variables",
+            "description": "Set up environment variables for API keys required by OpenAI and Cursor AI",
+            "dependencies": [1],
+            "details": "Create or update the `.env` file at project root with entries `OPENAI_API_KEY=<your_key>` and `CURSOR_AI_API_KEY=<your_key>`. Ensure `.gitignore` includes `.env` to avoid committing secrets.",
+            "status": "pending",
+            "testStrategy": "Write a small script that logs `process.env.OPENAI_API_KEY` and `process.env.CURSOR_AI_API_KEY` to confirm values load correctly"
+          },
+          {
+            "id": 3,
+            "title": "Implement Provider Client Initialization",
+            "description": "Create a service module to initialize and export OpenAI and Cursor AI client instances using environment variables",
+            "dependencies": [1, 2],
+            "details": "In `src/services/ai/providers.ts`, import the OpenAI client from the openai package and the CursorAI class from @cursorai/sdk. Instantiate each client with the appropriate API key from `process.env` and export them for use by downstream modules.",
+            "status": "pending",
+            "testStrategy": "Write unit tests that mock process.env values and assert that the exported clients have the correct apiKey property set"
+          },
+          {
+            "id": 4,
+            "title": "Initialize LangChain Text Generation Chain",
+            "description": "Set up a LangChain chain for text generation in a dedicated service module using the initialized AI clients",
+            "dependencies": [3],
+            "details": "In `src/services/ai/langchainService.ts`, import the exported provider clients and the LangChain classes (e.g., ChatOpenAI or LLMChain). Configure and instantiate a chain with your prompt templates and models, wiring it to use the OpenAI or Cursor AI client as needed. Export functions like `generateText(prompt)` for application use.",
+            "status": "pending",
+            "testStrategy": "Mock the provider clients and call the `generateText` function to verify the chain is instantiated and invoked with correct parameters"
+          },
+          {
+            "id": 5,
+            "title": "Validate AI Integration End-to-End",
+            "description": "Write integration tests or scripts to exercise the LangChain service and validate responses from the AI providers",
+            "dependencies": [4],
+            "details": "In `tests/aiIntegration.test.ts` or a script under `scripts/`, call the `generateText` function with a sample prompt. Use Nock or similar to stub external API calls if running CI without real API keys. Check that responses adhere to expected structure and handle errors gracefully.",
+            "status": "pending",
+            "testStrategy": "Run the integration tests locally and in CI, verifying both successful text generation and proper error handling when API keys are missing or calls fail"
+          }
+        ]
+      },
+      {
+        "id": 34,
+        "title": "Implement PRD-to-Task/Subtask Generator",
+        "description": "Create backend endpoint to parse PRD JSON via LLM into major tasks and subtasks.",
+        "details": "• Define POST /api/generate-tasks accepting PRD JSON\n• Construct prompt template to instruct LLM on task/milestone format\n• Parse LLM response into structured tasks and subtasks list\n• Save generated entries to database or return to frontend",
+        "testStrategy": "Send sample PRD JSON; assert returned JSON contains array of tasks with nested subtasks",
+        "priority": "high",
+        "dependencies": [32, 33],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define and implement POST /api/generate-tasks endpoint",
+            "description": "Create the backend HTTP endpoint to receive PRD JSON and perform initial validation",
+            "dependencies": [],
+            "details": "Use Express.js (or chosen framework) to define POST /api/generate-tasks. Apply JSON body parser middleware and validate request structure against a PRD JSON schema using Joi or Zod. Return 400 Bad Request on validation errors.",
+            "status": "pending",
+            "testStrategy": "Write unit tests sending valid and invalid payloads, asserting correct status codes and error messages."
+          },
+          {
+            "id": 2,
+            "title": "Develop LLM prompt template service",
+            "description": "Build a reusable service that constructs the prompt for the LLM based on incoming PRD JSON",
+            "dependencies": [1],
+            "details": "Implement a PromptService class that accepts PRD JSON and injects it into a templated instruction set. Use template literals or a lightweight templating engine to include examples of task/subtask format. Make the template configurable via environment or external file.",
+            "status": "pending",
+            "testStrategy": "Unit test PromptService with sample PRD inputs, verify the generated prompt contains required instructions and PRD fields."
+          },
+          {
+            "id": 3,
+            "title": "Integrate LLM API call in backend",
+            "description": "Implement the logic to send the generated prompt to the LLM provider and receive a response",
+            "dependencies": [2],
+            "details": "Use the LLM provider’s SDK or an HTTP client to call the API with the prompt from PromptService. Manage API keys via environment variables. Add retry logic and error handling for timeouts, rate limits, and invalid API responses.",
+            "status": "pending",
+            "testStrategy": "Mock the LLM client in unit tests to simulate successful, rate-limited, and error responses; assert correct handling and propagation of errors."
+          },
+          {
+            "id": 4,
+            "title": "Parse LLM response into structured tasks and subtasks",
+            "description": "Convert the raw LLM output into internal Task and Subtask data models",
+            "dependencies": [3],
+            "details": "Expect the LLM to return JSON array of tasks each with nested subtasks. Use JSON.parse with try/catch to handle syntax errors. Validate resulting structure with a JSON schema or class validators, map fields into Task/Subtask entities.",
+            "status": "pending",
+            "testStrategy": "Test parsing logic with valid JSON, missing fields, extra fields, and malformed JSON to ensure proper error handling and validation."
+          },
+          {
+            "id": 5,
+            "title": "Persist generated entries or return to frontend",
+            "description": "Save the parsed tasks/subtasks to the database or send them back in the HTTP response",
+            "dependencies": [4],
+            "details": "Use an ORM (Sequelize, TypeORM, Mongoose, etc.) to wrap creation of Task and Subtask records in a transaction. If persistence is disabled via config, skip DB save and return the structured data with a 200 response. Implement proper error handling, logging, and rollback on failure.",
+            "status": "pending",
+            "testStrategy": "Write integration tests using an in-memory or test database to verify persistence and response behavior, including transaction rollback on simulated failures."
+          }
+        ]
+      },
+      {
+        "id": 35,
+        "title": "Develop Prompt Generation Engine for Subtasks",
+        "description": "Implement service to generate per-subtask prompts for code snippets, CLI commands, and research links.",
+        "details": "• Define function generateSubtaskPrompt(subtask) using LangChain\n• Include templates for code, CLI, or resources based on subtask type\n• Return structured prompt object",
+        "testStrategy": "Call generateSubtaskPrompt with mock subtask; verify output matches expected template structure",
+        "priority": "medium",
+        "dependencies": [33],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Prompt Generation Service Skeleton",
+            "description": "Set up the file and dependencies required for prompt generation using LangChain. Define the function signature and types.",
+            "dependencies": [],
+            "details": "Create a new module (e.g. promptGenerator.ts). Install and import LangChain SDK. Define a TypeScript interface for Subtask input and the structured PromptOutput. Stub out function generateSubtaskPrompt(subtask: Subtask): Promise<PromptOutput>.",
+            "status": "pending",
+            "testStrategy": "Verify that the file compiles and that calling the stub returns a rejected or empty promise as expected."
+          },
+          {
+            "id": 2,
+            "title": "Define Prompt Templates for Each Subtask Type",
+            "description": "Create reusable template strings for code snippets, CLI commands, and research links.",
+            "dependencies": [1],
+            "details": "In the promptGenerator module, define three template constants (codeTemplate, cliTemplate, resourceTemplate) using LangChain PromptTemplate syntax or string interpolation. Include placeholders for subtask.title, subtask.description, and other metadata.",
+            "status": "pending",
+            "testStrategy": "Unit test that each template constant is a non-empty string containing the expected placeholders."
+          },
+          {
+            "id": 3,
+            "title": "Implement Template Selection Logic",
+            "description": "Add logic to select the appropriate template based on the subtask.type field.",
+            "dependencies": [2],
+            "details": "Inside generateSubtaskPrompt, switch on subtask.type (\"code\",\"cli\",\"resource\") and assign the corresponding template constant. Throw an error or fallback to a default template if type is unrecognized.",
+            "status": "pending",
+            "testStrategy": "Write tests passing dummy subtasks with each type and assert that the selected template matches the expected template constant."
+          },
+          {
+            "id": 4,
+            "title": "Generate and Return Structured Prompt Object",
+            "description": "Use LangChain to render the selected template with subtask data and return a structured object.",
+            "dependencies": [3],
+            "details": "Use LangChain’s PromptTemplate.format or a similar method to inject subtask fields into the selected template. Construct a PromptOutput object containing fields like text, variables, and metadata. Return this object from generateSubtaskPrompt.",
+            "status": "pending",
+            "testStrategy": "Mock LangChain’s format function to return a known string and verify that generateSubtaskPrompt returns the expected structured object."
+          },
+          {
+            "id": 5,
+            "title": "Write Unit Tests and Integrate into Service",
+            "description": "Ensure reliability by testing all paths and integrate the function into the larger prompt service.",
+            "dependencies": [4],
+            "details": "Create unit tests covering each subtask type, error cases, and output shape. Use a test framework (Jest or Mocha). After tests pass, register generateSubtaskPrompt in the service locator or API endpoint module so it can be consumed by downstream code.",
+            "status": "pending",
+            "testStrategy": "Run the full test suite and confirm 100% coverage for generateSubtaskPrompt. Test integration by calling the API or service entrypoint and verifying prompts for example subtasks."
+          }
+        ]
+      },
+      {
+        "id": 36,
+        "title": "Configure Visual Flowchart Component (React Flow Integration)",
+        "description": "Integrate React Flow into frontend to serve as canvas for tasks/subtasks visualization.",
+        "details": "• Install react-flow-renderer and react-flow-svelte adapter (or use React in SvelteKit)\n• Create Flowchart.svelte component wrapping React Flow instance\n• Initialize basic node/edge state",
+        "testStrategy": "Render Flowchart component; manually verify empty canvas with zoom/pan controls",
+        "priority": "medium",
+        "dependencies": [26],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install React Flow and Integration Packages",
+            "description": "Install the core React Flow library and the adapter needed to use React components in SvelteKit.",
+            "dependencies": [],
+            "details": "Run npm or yarn to install react-flow-renderer and @svitejs/svelte-adapter-react (or react-flow-svelte if preferred). e.g., npm install react-flow-renderer @svitejs/svelte-adapter-react",
+            "status": "pending",
+            "testStrategy": "Verify that both packages appear in package.json and node_modules folder."
+          },
+          {
+            "id": 2,
+            "title": "Configure SvelteKit for React Integration",
+            "description": "Enable React support in the SvelteKit project so React Flow components can be rendered inside Svelte components.",
+            "dependencies": [1],
+            "details": "In svelte.config.js, add the React adapter/plugin configuration (e.g., @svitejs/svelte-adapter-react or vite-plugin-react). Ensure tsconfig and vite.config.js are updated to recognize .jsx/.tsx files.",
+            "status": "pending",
+            "testStrategy": "Create a simple React component and import it into a Svelte page to confirm React renders correctly."
+          },
+          {
+            "id": 3,
+            "title": "Create Flowchart.svelte Component Wrapper",
+            "description": "Build a Svelte component that wraps a React Flow instance, providing a container for the diagram.",
+            "dependencies": [2],
+            "details": "Under src/components, create Flowchart.svelte. Use <script> to import ReactFlowProvider and ReactFlow from react-flow-renderer. Use svelte:component or reactWrapper to embed the ReactFlow element inside a container div.",
+            "status": "pending",
+            "testStrategy": "Render Flowchart.svelte in a route with no nodes/edges to confirm an empty canvas appears."
+          },
+          {
+            "id": 4,
+            "title": "Implement Node and Edge State Management",
+            "description": "Set up initial state and change handlers for nodes and edges inside Flowchart.svelte.",
+            "dependencies": [3],
+            "details": "In Flowchart.svelte, initialize two Svelte writable stores or local reactive variables: nodes and edges. Pass them to the ReactFlow component along with onNodesChange and onEdgesChange callbacks. Ensure the state updates correctly on interaction.",
+            "status": "pending",
+            "testStrategy": "Programmatically add/remove a node or edge and verify that the canvas updates accordingly."
+          },
+          {
+            "id": 5,
+            "title": "Add Sample Data and Validate Interactions",
+            "description": "Populate the flowchart with default nodes and edges and test user interactions like dragging, zooming, and linking.",
+            "dependencies": [4],
+            "details": "Define a sample nodes array with positions and labels, and an edges array with source/target pairs. Apply basic styling (width/height) to the container. Render them via ReactFlowProvider and test pan/zoom/drag events.",
+            "status": "pending",
+            "testStrategy": "Automated or manual test where sample flow displays correctly and can be panned, zoomed, and nodes can be dragged without errors."
+          }
+        ]
+      },
+      {
+        "id": 37,
+        "title": "Render Tasks & Subtasks as Nodes in Flowchart",
+        "description": "Map generated task/subtask data to React Flow nodes, styling by type and state.",
+        "details": "• Transform backend response into nodes and edges\n• Use custom node types for Task (large) and Subtask (nested)\n• Apply CSS classes for greyed-out future tasks",
+        "testStrategy": "Load sample tasks; verify correct node count, types, and grey styling for future items",
+        "priority": "medium",
+        "dependencies": [34, 36],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Normalize Backend Response to Node and Edge Data",
+            "description": "Convert the raw task and subtask data from the backend into arrays of node and edge objects that React Flow can consume.",
+            "dependencies": [],
+            "details": "Write a data transformation function that iterates over the backend response, creating a node object for each task and subtask with properties {id, type, data, position}. Create an edge for each parent-child relationship with {id, source, target}. Ensure unique IDs.",
+            "status": "pending",
+            "testStrategy": "Unit test the transformation function with various mock responses, asserting correct node and edge counts and property values."
+          },
+          {
+            "id": 2,
+            "title": "Create Custom React Flow Node Components",
+            "description": "Implement two React components for rendering Task and Subtask nodes with different layouts and sizes.",
+            "dependencies": [1],
+            "details": "Define TaskNode and SubtaskNode as functional components. Use React Flow’s handle API for ports. TaskNode should render a large container with title and summary; SubtaskNode a smaller nested container. Register these components in the React Flow nodeTypes prop.",
+            "status": "pending",
+            "testStrategy": "Snapshot test each component in isolation to verify structure and correct props rendering."
+          },
+          {
+            "id": 3,
+            "title": "Define and Apply CSS Classes for Node States",
+            "description": "Set up CSS classes to style nodes based on their state (future, active, completed) and apply them in node components.",
+            "dependencies": [2],
+            "details": "Create CSS or SCSS modules with classes like .node--future {opacity:0.5;}, .node--active {border-color:blue;}, .node--completed {background-color:grey;}. In TaskNode and SubtaskNode, read the state from props.data.state and add the appropriate className.",
+            "status": "pending",
+            "testStrategy": "Render nodes with mock states and check className assignments; use visual regression to detect style changes."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Nodes and Edges into React Flow Chart",
+            "description": "Wire up the transformed nodes and edges and custom node components into the main React Flow component.",
+            "dependencies": [1, 2, 3],
+            "details": "In the FlowChart component, import the transformation function and custom nodeTypes. Call the transformation on backend data and pass resulting nodes and edges into <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} />. Ensure CSS is loaded.",
+            "status": "pending",
+            "testStrategy": "Render the FlowChart in a storybook or test harness with mock data and assert that the expected number of DOM elements for nodes and edges appear."
+          },
+          {
+            "id": 5,
+            "title": "Write End-to-End and Unit Tests for Flowchart Rendering",
+            "description": "Ensure correct integration and behavior of nodes, styling, and edges in the flowchart through automated tests.",
+            "dependencies": [4],
+            "details": "Add unit tests for state-driven class assignment and edge existence. Use a testing library to mount the FlowChart with a full mock dataset, then verify that nodes are rendered in the right positions, with correct types, styles, and edge connections.",
+            "status": "pending",
+            "testStrategy": "Combine Jest and React Testing Library to assert presence of elements by data-testid tags, and Cypress visual tests to validate rendered flowchart visually."
+          }
+        ]
+      },
+      {
+        "id": 38,
+        "title": "Implement Drag-and-Drop & Node Linking in Flowchart",
+        "description": "Enable users to reposition nodes and create links between tasks/subtasks.",
+        "details": "• Configure React Flow options: draggable, connectable\n• Handle onNodeDragStop to update node positions\n• Handle onConnect to add edges in state and persist if needed",
+        "testStrategy": "Drag nodes to new positions and draw connections; assert state updates accordingly",
+        "priority": "medium",
+        "dependencies": [37],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Enable Drag-and-Drop and Node Connection in React Flow",
+            "description": "Configure the React Flow component to allow nodes to be draggable and to enable edge creation between nodes.",
+            "dependencies": [],
+            "details": "In your Flowchart component, set the ReactFlow props draggable={true} and connectable={true}. Ensure nodes have unique IDs and include connection handles (e.g., sourceHandle and targetHandle). Optionally configure default edge types and style.",
+            "status": "pending",
+            "testStrategy": "Manually verify in the UI that nodes can be picked up and moved, and that drag handles appear to start creating connections."
+          },
+          {
+            "id": 2,
+            "title": "Implement onNodeDragStop Handler to Update Node Positions",
+            "description": "Add an event handler for onNodeDragStop to capture node movement events and update the client-side state with new positions.",
+            "dependencies": [1],
+            "details": "In the Flowchart component, supply an onNodeDragStop prop: const handleNodeDragStop = (event, node) => { setNodes(nds => nds.map(n => n.id===node.id?{...n, position:node.position}:n)); }; Pass handleNodeDragStop into ReactFlow.",
+            "status": "pending",
+            "testStrategy": "Drag a node in the UI and use console.log or React DevTools to confirm that the nodes state reflects the updated coordinates."
+          },
+          {
+            "id": 3,
+            "title": "Persist Updated Node Positions to Backend",
+            "description": "Implement API integration in the onNodeDragStop handler to save updated node positions to the server.",
+            "dependencies": [2],
+            "details": "Within handleNodeDragStop, after updating state, send a PATCH request to `/api/nodes/${node.id}/position` with body { x: node.position.x, y: node.position.y }. Handle loading and error states and rollback state on failure.",
+            "status": "pending",
+            "testStrategy": "Use a mock server or API spy to verify that dragging a node triggers the correct network request and that the backend stores the new coordinates."
+          },
+          {
+            "id": 4,
+            "title": "Implement onConnect Handler to Add New Edges",
+            "description": "Add an onConnect event handler to capture new connections between nodes and update the edges in state.",
+            "dependencies": [1],
+            "details": "In your Flowchart component, define const handleConnect = connection => { setEdges(eds => addEdge({...connection, id:`${connection.source}-${connection.target}`}, eds)); }; Pass handleConnect into ReactFlow. Use addEdge utility from react-flow-renderer for immutability.",
+            "status": "pending",
+            "testStrategy": "Connect two nodes in the UI and verify that the edges state (via console or DevTools) includes the new edge with correct source, target, and handle IDs."
+          },
+          {
+            "id": 5,
+            "title": "Persist New Edge Connections to Backend",
+            "description": "Integrate API calls in onConnect to save new edge relationships to your backend.",
+            "dependencies": [4],
+            "details": "Extend handleConnect to send a POST request to `/api/edges` with payload { source, target, sourceHandle, targetHandle }. Handle success and error responses, showing user feedback or retry on failure.",
+            "status": "pending",
+            "testStrategy": "Use integration tests or API mocks to ensure that connecting nodes triggers the expected POST request and that the backend records the new edge."
+          }
+        ]
+      },
+      {
+        "id": 39,
+        "title": "Implement Task Lifecycle State Management in UI",
+        "description": "Manage task statuses (Not Started → In Progress → Testing → Complete) and unlocking logic.",
+        "details": "• Define state machine for task lifecycle\n• Prevent activation of tasks until dependencies complete\n• Provide override toggle to activate early\n• Reflect status in node styling",
+        "testStrategy": "Mark a task complete; verify dependent tasks unlock; test override toggles functionality",
+        "priority": "medium",
+        "dependencies": [37, 38],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Task Status Enum and Extend Data Model",
+            "description": "Create a status enumeration (Not Started, In Progress, Testing, Complete) and update the task data model to include a status field.",
+            "dependencies": [],
+            "details": "In your state management layer (e.g. Redux slice or React Context), define a TypeScript enum or constant for the four statuses. Update the Task interface/type to include a `status` property defaulting to `Not Started`. Ensure new tasks are initialized with `Not Started`.",
+            "status": "pending",
+            "testStrategy": "Write unit tests to verify the enum values and that newly created tasks have `Not Started` status by default."
+          },
+          {
+            "id": 2,
+            "title": "Implement State Machine Logic for Status Transitions",
+            "description": "Build the core state transition functions enforcing the allowed lifecycle (Not Started → In Progress → Testing → Complete).",
+            "dependencies": [1],
+            "details": "Using a state machine library (e.g. XState) or custom transition map, implement a `transitionTaskStatus(taskId, targetStatus)` function. Validate the current status against allowed transitions before applying the update to the store.",
+            "status": "pending",
+            "testStrategy": "Unit tests for each valid transition path and for attempts to perform invalid transitions (e.g. Not Started → Testing)."
+          },
+          {
+            "id": 3,
+            "title": "Enforce Dependency-based Unlocking",
+            "description": "Prevent a task from entering `In Progress` until all its dependent tasks are in `Complete`.",
+            "dependencies": [2],
+            "details": "Enhance `transitionTaskStatus` to check the `dependencies` array on the target task. Before transitioning to `In Progress`, fetch each dependency’s status from the store and block the transition if any are not `Complete`. Display an error or tooltip when the block occurs.",
+            "status": "pending",
+            "testStrategy": "Integration tests creating tasks with dependencies and verifying that locked tasks cannot start until dependencies complete."
+          },
+          {
+            "id": 4,
+            "title": "Add Override Toggle for Early Activation",
+            "description": "Allow users to override dependency locks and force a task into `In Progress` prior to dependencies completing.",
+            "dependencies": [3],
+            "details": "Extend the task model with a boolean `overrideLock` flag. In the task detail panel or node context menu, add a toggle control bound to this flag. Adjust the transition logic to skip dependency checks if `overrideLock === true`.",
+            "status": "pending",
+            "testStrategy": "UI tests toggling the override setting and verifying that locked tasks can be manually started when override is on, and are blocked when off."
+          },
+          {
+            "id": 5,
+            "title": "Update UI Node Styling and Indicators Based on Status and Override",
+            "description": "Visually reflect each task’s status and override state in the node diagram with distinct styling and icons.",
+            "dependencies": [2, 4],
+            "details": "Define CSS classes or styled-component variants for each status and an override indicator. In the task graph renderer, apply the correct class and render a small badge/icon when `overrideLock` is active. Ensure styles update reactively on state changes.",
+            "status": "pending",
+            "testStrategy": "Visual regression or snapshot tests in Storybook verifying nodes render with correct styles for all status and override combinations."
+          }
+        ]
+      },
+      {
+        "id": 40,
+        "title": "Build Testing Phase UI & Workflow",
+        "description": "Show Test button when subtasks complete and provide manual checklist interface.",
+        "details": "• Detect when all subtasks of a task have status Complete\n• Display Test button in node detail panel\n• Render checklist of test items returned from AI\n• Allow users to check off items and finalize task",
+        "testStrategy": "Complete subtasks, click Test, interact with checklist, and confirm task completion",
+        "priority": "medium",
+        "dependencies": [35, 39],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement backend subtask completion check",
+            "description": "Extend the Task service and data model to determine when all subtasks of a given task have status Complete",
+            "dependencies": [],
+            "details": "Add a computed boolean field `allSubtasksComplete` to the Task entity or view model; update the `GET /tasks/:id` endpoint to include this flag by querying the Subtasks table and verifying all have status 'Complete'.",
+            "status": "pending",
+            "testStrategy": "Unit test service logic with tasks having mixed subtask statuses; API integration test to verify `allSubtasksComplete` in response."
+          },
+          {
+            "id": 2,
+            "title": "Create AI-based test checklist generation endpoint",
+            "description": "Implement a new backend endpoint to generate and return a list of test checklist items for a task by invoking the AI service",
+            "dependencies": [],
+            "details": "Define `POST /tasks/:id/test-checklist` that receives a task ID, calls the AI adapter with task context, transforms the AI response into an array of checklist item strings, and returns JSON `{ items: [...] }`. Handle timeouts and errors gracefully.",
+            "status": "pending",
+            "testStrategy": "Mock the AI adapter in integration tests to simulate various responses and verify endpoint returns correct schema and error handling."
+          },
+          {
+            "id": 3,
+            "title": "Add Test button to Task Detail panel",
+            "description": "Update the frontend TaskDetail component to display a 'Test' button when `allSubtasksComplete` is true, and trigger checklist retrieval on click",
+            "dependencies": [1, 2],
+            "details": "In TaskDetail.jsx, read `allSubtasksComplete` from the API response or Redux store; conditionally render the Test button; on click dispatch a `fetchTestChecklist(taskId)` action that calls the new endpoint and stores the returned items in state.",
+            "status": "pending",
+            "testStrategy": "Write a component test to verify button visibility based on flag; stub the API call to assert `fetchTestChecklist` is invoked and items are populated."
+          },
+          {
+            "id": 4,
+            "title": "Build Test Checklist UI component",
+            "description": "Create a reusable Checklist component that renders test items with checkboxes, allowing users to mark items as done",
+            "dependencies": [3],
+            "details": "Implement `TestChecklist.jsx` that accepts `items: string[]` and maintains local state for checked items. Render a list of `<input type=\"checkbox\">` elements with labels. Expose callbacks for item toggle and provide a 'Finalize' button.",
+            "status": "pending",
+            "testStrategy": "Component unit tests to verify initial render of items, checkbox toggling updates state, and callback invocation on change."
+          },
+          {
+            "id": 5,
+            "title": "Finalize Test Workflow and persist results",
+            "description": "Implement frontend and backend changes to submit completed checklist results and update task status",
+            "dependencies": [4],
+            "details": "Backend: define `POST /tasks/:id/test-results` to accept `{ results: { item: string; checked: boolean }[] }`, store in a `TestResults` table, and update task status to 'Tested'. Frontend: wire the Checklist component's 'Finalize' button to dispatch a `submitTestResults` action that calls this endpoint, then refresh the TaskDetail view to reflect the new status.",
+            "status": "pending",
+            "testStrategy": "End-to-end tests: simulate completing all subtasks, click Test, check items, finalize; assert database records in TestResults and task status update reflected in UI."
+          }
+        ]
+      },
+      {
+        "id": 41,
+        "title": "Generate AI-driven Tests & Checklists",
+        "description": "On Test button click, call AI service to produce unit tests and manual checklist suggestions.",
+        "details": "• Create POST /api/generate-tests accepting task and subtasks data\n• Use LangChain prompt template for test generation\n• Return JSON list of test cases and manual steps",
+        "testStrategy": "Invoke endpoint with sample task; assert presence of unit test code snippets and checklist items",
+        "priority": "medium",
+        "dependencies": [33, 40],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define POST /api/generate-tests Endpoint",
+            "description": "Create and configure a new POST endpoint in the backend to accept task and subtasks data payload for test and checklist generation.",
+            "dependencies": [],
+            "details": "In your Express (or chosen framework) router, add a route POST /api/generate-tests. Validate incoming JSON schema (taskId, taskTitle, subtasks array) using a validation library like Joi or Zod. Return a placeholder response for now.",
+            "status": "pending",
+            "testStrategy": "Write unit tests to send valid and invalid payloads and assert HTTP 200 for valid and 400 for invalid requests."
+          },
+          {
+            "id": 2,
+            "title": "Implement LangChain Prompt Template",
+            "description": "Set up and configure a LangChain prompt template to generate unit tests and manual checklists based on input data.",
+            "dependencies": [1],
+            "details": "Install LangChain SDK. Create a prompt template file specifying template variables: task title, subtasks descriptions. Include instructions for AI to output JSON list of test case objects and manual step objects.",
+            "status": "pending",
+            "testStrategy": "Write unit tests to render the prompt template with mock data and assert that all placeholders are correctly replaced."
+          },
+          {
+            "id": 3,
+            "title": "Integrate AI Service Call in Endpoint",
+            "description": "Within POST /api/generate-tests handler, call the AI service using LangChain with the prompt template and input payload.",
+            "dependencies": [1, 2],
+            "details": "Import LangChain client and prompt template. In the route handler, assemble prompt inputs from request body. Execute the chain and await the AI response. Implement error handling for timeouts and API errors.",
+            "status": "pending",
+            "testStrategy": "Mock the LangChain client in unit tests to return a sample AI response and verify that the handler calls the client with correct prompt data and returns a 200 status."
+          },
+          {
+            "id": 4,
+            "title": "Parse and Format AI Response",
+            "description": "Process the raw AI output to extract and structure test cases and manual checklist steps as JSON.",
+            "dependencies": [3],
+            "details": "Validate AI response format. Use JSON.parse or safe parsing libraries to extract testCases (id, description, code snippet) and manualSteps (id, description). Map them into a response object and sanitize any unwanted fields.",
+            "status": "pending",
+            "testStrategy": "Write unit tests with sample AI outputs (valid and malformed) to assert correct parsing, error handling, and response structure."
+          },
+          {
+            "id": 5,
+            "title": "Frontend Integration and Display Results",
+            "description": "Implement frontend logic to invoke the new API on Test button click and render returned test cases and manual checklist steps in the UI.",
+            "dependencies": [4],
+            "details": "In the frontend codebase, add an event listener to the Test button. Call POST /api/generate-tests with current task and subtasks via fetch or axios. On success, parse JSON and update state to display unit tests (formatted code blocks) and manual checklist (list items). Handle loading and error states.",
+            "status": "pending",
+            "testStrategy": "Write integration tests or use Cypress to simulate button clicks, mock API responses, and assert that the UI displays the correct number of test cases and checklist items, as well as error messages when the API fails."
+          }
+        ]
+      },
+      {
+        "id": 42,
+        "title": "Implement Save & Load Project JSON Files",
+        "description": "Allow users to export and import full project state as JSON file.",
+        "details": "• Add Export button to download JSON via browser FileSaver API\n• Add Import button to open file picker and parse JSON\n• Validate schema before loading and merge into app state",
+        "testStrategy": "Export current project, reload app empty, import file, and verify state matches original",
+        "priority": "medium",
+        "dependencies": [29],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Project JSON Schema and Validation",
+            "description": "Create a comprehensive JSON Schema for the full project state and implement validation logic.",
+            "dependencies": [],
+            "details": "Add a JSON Schema file (e.g. schemas/project-schema.json) covering all entities (settings, assets, scenes, metadata). Integrate AJV (or a similar library) in services/ProjectSerializer.ts to compile and export a validateProjectSchema(data) function.",
+            "status": "pending",
+            "testStrategy": "Write unit tests with valid and invalid sample project objects to ensure validateProjectSchema returns expected results."
+          },
+          {
+            "id": 2,
+            "title": "Add Export Button to UI",
+            "description": "Add an 'Export' button to the application toolbar or menu to initiate project export.",
+            "dependencies": [1],
+            "details": "In the React toolbar component (e.g. Toolbar.jsx), render a new button labeled 'Export'. Wire its onClick handler to call the export function provided by ProjectSerializer. Ensure styling and accessibility (aria-label) match existing buttons.",
+            "status": "pending",
+            "testStrategy": "Verify the button renders correctly, is clickable, and triggers the handler (use React Testing Library to simulate a click and spy on the export function)."
+          },
+          {
+            "id": 3,
+            "title": "Implement Export Logic with FileSaver API",
+            "description": "Serialize the current application state to JSON, validate it, and trigger download using the FileSaver API.",
+            "dependencies": [2],
+            "details": "In services/ProjectSerializer.ts implement exportProject(state):\n1. Validate with validateProjectSchema(state).\n2. Call JSON.stringify(state, null, 2).\n3. Create a Blob and use FileSaver.saveAs(blob, 'project.json').",
+            "status": "pending",
+            "testStrategy": "Mock FileSaver.saveAs and test exportProject with valid state to ensure saveAs is called with correct Blob content; test invalid state to ensure an error is thrown or reported."
+          },
+          {
+            "id": 4,
+            "title": "Add Import Button and File Picker UI",
+            "description": "Add an 'Import' button to open a file picker for selecting a project JSON file.",
+            "dependencies": [1],
+            "details": "In Toolbar.jsx add a hidden <input type=\"file\" accept=\"application/json\" /> element and an 'Import' button. Clicking the button should trigger input.click(). On input change, pass the selected File to the import handler in ProjectSerializer.",
+            "status": "pending",
+            "testStrategy": "Use integration tests to simulate file selection; ensure the import handler receives the correct File object."
+          },
+          {
+            "id": 5,
+            "title": "Implement Import Logic and Merge State",
+            "description": "Read the selected JSON file, parse and validate it, then merge the loaded state into the application.",
+            "dependencies": [4, 1],
+            "details": "In ProjectSerializer.ts implement importProject(file):\n1. Use FileReader to read file as text.\n2. Parse JSON and run validateProjectSchema(parsed).\n3. If valid, dispatch mergeProjectState(parsed) to Redux or context.\n4. Handle errors by showing a user notification and aborting merge.",
+            "status": "pending",
+            "testStrategy": "Mock FileReader and Redux dispatch: test with valid file content to confirm dispatch of correct action, and with invalid content to confirm error handling and no state change."
+          }
+        ]
+      },
+      {
+        "id": 43,
+        "title": "Implement Autosave Functionality",
+        "description": "Automatically persist project changes to local storage on state updates.",
+        "details": "• Debounce state change listener in Svelte store\n• Call ProjectStorageService.save() after 500ms of inactivity\n• Show brief 'Autosaved' notification",
+        "testStrategy": "Modify node position or status, refresh page without manual save, and verify state persisted",
+        "priority": "medium",
+        "dependencies": [29],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Debounce Utility",
+            "description": "Create a generic debounce function to delay execution of callbacks until a specified period of inactivity has passed.",
+            "dependencies": [],
+            "details": "In the utilities folder, add a debounce.ts file exporting a function debounce(fn: Function, wait: number). Use setTimeout/clearTimeout to reset the timer on each call and invoke fn after wait milliseconds.",
+            "status": "pending",
+            "testStrategy": "Write unit tests verifying that the debounced function only fires once after rapid successive calls and respects the wait interval."
+          },
+          {
+            "id": 2,
+            "title": "Subscribe to Svelte Store with Debounce",
+            "description": "Attach a listener to the project state Svelte store that uses the debounce utility to buffer rapid state changes.",
+            "dependencies": [1],
+            "details": "In the project store module, import debounce. Wrap the store.subscribe callback in debounce(fn, 500). Ensure the debounced callback receives the latest state object after 500ms of no updates.",
+            "status": "pending",
+            "testStrategy": "Simulate state updates in tests and assert that the debounced callback is called only after pauses longer than 500ms."
+          },
+          {
+            "id": 3,
+            "title": "Trigger Autosave via ProjectStorageService",
+            "description": "Invoke ProjectStorageService.save() inside the debounced store update callback to persist changes after inactivity.",
+            "dependencies": [2],
+            "details": "Inside the debounced callback from subtask 2, import ProjectStorageService and call save(currentState). Handle promise resolution or errors without disrupting app flow.",
+            "status": "pending",
+            "testStrategy": "Mock ProjectStorageService.save() to confirm it's called with correct state and test debounced timing ensures single call per inactivity period."
+          },
+          {
+            "id": 4,
+            "title": "Create 'Autosaved' Notification Component",
+            "description": "Develop a lightweight notification component to display brief confirmation that autosave occurred.",
+            "dependencies": [],
+            "details": "In the UI components directory, implement AutosaveNotification.svelte with a text slot and fade-out animation. Expose a method show(message: string) that renders the notification for 2 seconds before disappearing.",
+            "status": "pending",
+            "testStrategy": "Render the component in isolation, call show(), and use a testing library to assert visibility and automatic dismissal after the timeout."
+          },
+          {
+            "id": 5,
+            "title": "Integrate Notification with Autosave Flow",
+            "description": "Hook the notification component into the save process to display 'Autosaved' after each successful autosave.",
+            "dependencies": [3, 4],
+            "details": "In the debounced callback after ProjectStorageService.save() resolves, import and call AutosaveNotification.show('Autosaved'). Ensure errors skip notification. Clean up any timers if necessary.",
+            "status": "pending",
+            "testStrategy": "Use an end-to-end test to simulate state changes, wait for autosave trigger, and assert that the notification appears and then disappears as expected."
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-15T00:18:24.743Z",
+      "updated": "2025-07-15T00:20:49.035Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

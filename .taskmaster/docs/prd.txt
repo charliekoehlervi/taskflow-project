@@ -1,0 +1,247 @@
+Product Requirements Document (PRD)
+
+Project Name: AI Prompt Flowchart & Project Planner
+Platforms: Web-first (installable via PWA), Desktop (Electron), Mobile (limited functionality)
+Target Users: Solo developers, small teams, remote collaborators, and hobbyists
+
+1. Purpose
+
+This tool enables solo developers and small teams to visually plan, build, and manage AI-assisted software projects. It simplifies project breakdowns, task tracking, and collaboration through a PRD-driven flowchart interface, AI prompting system, and flexible editing. Cursor AI is the primary AI integration target.
+
+2. Target Audience
+
+Primary Users:
+
+Solo developers using AI tools like Cursor AI
+
+Secondary Users:
+
+Small to medium-sized teams working on full-stack, mobile, or AI-integrated apps
+
+Hobbyists or non-technical users managing non-code flowcharts (e.g., house projects)
+
+3. Core Features
+
+3.1 PRD Interview Flow
+
+Initiated when user selects "Create New Project"
+
+Step-by-step interview captures:
+
+Project goal
+
+Target user
+
+Feature scope
+
+Platform needs
+
+Collaboration level
+
+Output: structured PRD stored as JSON, and used to generate initial flowchart
+
+3.2 Task & Subtask Generation
+
+AI parses PRD into:
+
+Major tasks (milestones)
+
+Subtasks per major task
+
+Subtasks form the units of progress
+
+Optional AI-based branching after each task or milestone
+
+3.3 Visual Flowchart (React Flow or Konva)
+
+Flowchart represents project structure
+
+Nodes:
+
+Task nodes (large)
+
+Subtask nodes (nested or linked)
+
+Greyed-out for future tasks
+
+Tasks become active only after prior completion (unless user overrides)
+
+Drag-and-drop enabled
+
+3.4 Prompting Engine
+
+Built-in prompt generation system powered by integrated LLM (OpenAI, Anthropic, etc.)
+
+Per-subtask prompts for:
+
+Code snippets
+
+CLI command suggestions
+
+Research links / resource help
+
+Cursor AI integration preferred (send prompts + receive actionable code)
+
+Manual prompt refinement allowed
+
+3.5 Testing Phase
+
+“Test” button appears when all subtasks in a task are completed
+
+AI generates:
+
+Unit tests (if applicable)
+
+Manual test checklists
+
+Suggestions for validation
+
+User manually checks off passed tests
+
+Once confirmed, task is marked complete
+
+3.6 Task Lifecycle
+
+Status states:
+
+Not Started (greyed out)
+
+In Progress (subtasks revealed)
+
+Testing (test button active)
+
+Complete (unlocks next task)
+
+Optional branching after completion
+
+3.7 Save & Load (Offline/Local-first)
+
+Projects saved to local JSON file
+
+Autosave functionality
+
+Open/load existing project files
+
+Structure:
+
+Project metadata
+
+PRD content
+
+Tasks/subtasks + statuses
+
+AI prompt history
+
+3.8 Auth & Cloud Sync (Post-MVP Expansion)
+
+Login/Logout with Clerk or Auth.js
+
+User projects stored in cloud (PostgreSQL)
+
+User settings, templates, and team orgs
+
+Authorization levels: Owner, Editor, Viewer
+
+4. Optional/Planned Features
+
+4.1 Collaboration Suite (Post-MVP)
+
+Real-time multiplayer editing (via WebSockets, Yjs, or Automerge)
+
+Comments, tagging, threads per task
+
+Activity log
+
+Role-based permissions (Owner, Editor, Viewer)
+
+4.2 Project Versioning
+
+Snapshot of original PRD & task tree
+
+Option to revert to original
+
+Basic version history for changes
+
+Git-style forking and branching
+
+4.3 Templates & Reusability
+
+Save any project as template
+
+Convert charts into reusable templates
+
+AI-enhanced template generation from goals
+
+4.4 Cross-Platform Support
+
+Desktop (Electron)
+
+Full feature parity
+
+Access to file system (to interface with Cursor projects locally)
+
+Mobile
+
+Limited functionality:
+
+View tasks, check status
+
+Comment, suggest, add subtasks via AI
+
+Mark subtasks complete
+
+5. MVP Scope
+
+Must-Have Features for Launch:
+
+PRD interview builder
+
+AI-based task + subtask generation from PRD
+
+Flowchart display of all tasks/subtasks
+
+Prompting system with code/command/test generation
+
+Task lifecycle system (Not Started → In Progress → Testing → Complete)
+
+Manual confirmation of testing success
+
+Local save/load support
+
+Auth login/logout (basic)
+
+6. Technical Stack
+
+Frontend: SvelteKit or SolidJS (TBD) with React Flow or Konva
+
+Backend: Node.js (TS) or Go
+
+AI Layer: LangChain (JS or Python), OpenAI, Cursor AI (if feasible)
+
+Database: PostgreSQL
+
+Realtime: WebSockets / Yjs / Automerge
+
+Auth: Clerk or Auth.js
+
+7. Risks & Considerations
+
+Cursor AI integration depends on external API access
+
+Managing sync between visual flow and AI prompt logic
+
+Mobile/desktop platform parity
+
+Balancing visual UX for advanced users vs. newcomers
+
+8. Success Criteria
+
+MVP launch usable offline and by solo developers
+
+Full PRD → Flowchart → Completion cycle functional
+
+AI prompting generates meaningful, context-aware suggestions
+
+80% of tasks testable and marked complete by user without needing external tools
+
+Be as thorough as possible, take your time, no rush 
